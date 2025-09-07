@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2a2a2a 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        .hero {
+            background: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/hero-bg.jpg') no-repeat center center/cover;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        .glow-text {
+            text-shadow: 0 0 20px rgba(255, 165, 0, 0.8);
+        }
+        .card {
+            background: rgba(34, 34, 34, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: #ffa500;
+            box-shadow: 0 25px 50px rgba(255, 165, 0, 0.3);
+        }
+        .btn-premium {
+            background: linear-gradient(45deg, #ffa500, #ffb347);
+            color: #000;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-premium:hover {
+            box-shadow: 0 0 25px rgba(255, 165, 0, 0.7);
+            transform: translateY(-2px);
+        }
+        .nav-btn {
+            background: rgba(68, 68, 68, 0.8);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(255, 165, 0, 0.9);
+            color: #000;
+            transform: translateY(-2px);
+        }
+        .admin-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 100; /* Ensure it's above other content */
+        }
+        .admin-toggle:hover {
+            background: rgba(255, 165, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .video-embed {
+            width: 100%;
+            height: 315px;
+            max-width: 560px;
+            border-radius: 12px;
+        }
+        .image-display {
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        .image-display:hover {
+            transform: scale(1.02);
+        }
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="text-6xl font-bold glow-text mb-4">Anime Hub</h1>
+            <p class="text-xl mb-8 text-gray-300">Your ultimate destination for anime, manga, and manhwa</p>
+            <a href="#main-content" class="btn-premium px-8 py-3">Explore Now</a>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav id="main-content" class="bg-gray-900 p-4 shadow-lg">
+        <div class="flex justify-center space-x-8">
+            <button id="nav-anime" class="nav-btn px-8 py-3 text-lg font-semibold active">Anime</button>
+            <button id="nav-manga" class="nav-btn px-8 py-3 text-lg font-semibold">Manga</button>
+            <button id="nav-manhwa" class="nav-btn px-8 py-3 text-lg font-semibold">Manhwa</button>
+        </div>
+    </nav>
+
+    <!-- Admin Toggle Button -->
+    <div class="admin-toggle" id="admin-toggle" title="Admin Panel">
+        <i class="fas fa-cog"></i>
+    </div>
+
+    <main class="p-8 fade-in">
+        <!-- Anime View -->
+        <div id="anime-view">
+            <h2 class="text-4xl font-bold text-orange-500 text-center mb-8 glow-text">Popular Anime</h2>
+            <div id="anime-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-12">
+                <!-- Anime cards -->
+            </div>
+            <div id="anime-season-view" class="mb-12 hidden">
+                <h3 id="anime-selected" class="text-3xl font-bold text-orange-500 mb-6 glow-text"></h3>
+                <div id="anime-seasons-list" class="flex flex-wrap gap-4">
+                    <!-- Seasons -->
+                </div>
+            </div>
+            <div id="anime-videos-view" class="mb-12 hidden">
+                <h4 id="anime-selected-season" class="text-2xl font-bold text-orange-500 mb-6 glow-text"></h4>
+                <div id="anime-videos-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Videos -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Manga View -->
+        <div id="manga-view" class="hidden">
+            <h2 class="text-4xl font-bold text-green-500 text-center mb-8 glow-text">Popular Manga</h2>
+            <div id="manga-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-12">
+                <!-- Manga cards -->
+            </div>
+            <div id="manga-chapter-view" class="mb-12 hidden">
+                <h3 id="manga-selected" class="text-3xl font-bold text-green-500 mb-6 glow-text"></h3>
+                <div id="manga-chapters-list" class="flex flex-wrap gap-4">
+                    <!-- Chapters -->
+                </div>
+            </div>
+            <div id="manga-pages-view" class="mb-12 hidden">
+                <h4 id="manga-selected-chapter" class="text-2xl font-bold text-green-500 mb-6 glow-text"></h4>
+                <div id="manga-pages-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pages -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Manhwa View -->
+        <div id="manhwa-view" class="hidden">
+            <h2 class="text-4xl font-bold text-purple-500 text-center mb-8 glow-text">Popular Manhwa</h2>
+            <div id="manhwa-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-12">
+                <!-- Manhwa cards -->
+            </div>
+            <div id="manhwa-chapter-view" class="mb-12 hidden">
+                <h3 id="manhwa-selected" class="text-3xl font-bold text-purple-500 mb-6 glow-text"></h3>
+                <div id="manhwa-chapters-list" class="flex flex-wrap gap-4">
+                    <!-- Chapters -->
+                </div>
+            </div>
+            <div id="manhwa-pages-view" class="mb-12 hidden">
+                <h4 id="manhwa-selected-chapter" class="text-2xl font-bold text-purple-500 mb-6 glow-text"></h4>
+                <div id="manhwa-pages-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pages -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="admin-view" class="hidden absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+            <div id="password-prompt" class="bg-gray-800 p-8 rounded-2xl shadow-2xl text-center">
+                <h3 class="text-2xl mb-6 text-orange-500">Admin Access</h3>
+                <input type="password" id="password-input" class="border-2 border-gray-600 p-4 rounded-xl bg-gray-700 text-white mb-6 w-full" placeholder="Enter Password">
+                <div>
+                    <button id="password-submit" class="btn-premium px-8 py-3 mr-4">Enter</button>
+                    <button id="password-cancel" class="px-8 py-3 bg-gray-600 hover:bg-gray-700 rounded-xl">Cancel</button>
+                </div>
+            </div>
+            <div id="admin-panel" class="hidden bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-6xl w-full max-h-screen overflow-y-auto">
+                <h3 class="text-3xl font-bold mb-8 text-orange-500 glow-text">Admin Panel</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    <!-- Anime Section -->
+                    <div class="card p-6 rounded-xl">
+                        <h4 class="text-xl font-semibold mb-4 text-orange-500">Anime</h4>
+                        <div class="mb-4">
+                            <input type="text" id="new-anime-name" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600" placeholder="Anime Name">
+                            <button id="add-anime-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Anime</button>
+                        </div>
+                        <div class="mb-4">
+                            <select id="select-anime-for-season" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"></select>
+                            <input type="text" id="new-season-name" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3" placeholder="Season Name">
+                            <button id="add-anime-season-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Season</button>
+                        </div>
+                        <div>
+                            <select id="select-anime-for-video" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600" onchange="updateAnimeSeasons()"></select>
+                            <select id="select-anime-season-for-video" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3"></select>
+                            <input type="url" id="new-video-link" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3" placeholder="Video Link">
+                            <button id="add-video-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Video</button>
+                        </div>
+                    </div>
+                    <!-- Manga Section -->
+                    <div class="card p-6 rounded-xl">
+                        <h4 class="text-xl font-semibold mb-4 text-green-500">Manga</h4>
+                        <div class="mb-4">
+                            <input type="text" id="new-manga-name" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600" placeholder="Manga Name">
+                            <button id="add-manga-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Manga</button>
+                        </div>
+                        <div class="mb-4">
+                            <select id="select-manga-for-chapter" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"></select>
+                            <input type="text" id="new-chapter-name" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3" placeholder="Chapter Name">
+                            <button id="add-manga-chapter-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Chapter</button>
+                        </div>
+                        <div>
+                            <select id="select-manga-for-page" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600" onchange="updateMangaChapters()"></select>
+                            <select id="select-manga-chapter-for-page" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3"></select>
+                            <input type="url" id="new-page-link" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3" placeholder="Page Link (Image/PDF)">
+                            <button id="add-page-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Page/PDF</button>
+                        </div>
+                    </div>
+                    <!-- Manhwa Section -->
+                    <div class="card p-6 rounded-xl">
+                        <h4 class="text-xl font-semibold mb-4 text-purple-500">Manhwa</h4>
+                        <div class="mb-4">
+                            <input type="text" id="new-manhwa-name" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600" placeholder="Manhwa Name">
+                            <button id="add-manhwa-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Manhwa</button>
+                        </div>
+                        <div class="mb-4">
+                            <select id="select-manhwa-for-chapter" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600"></select>
+                            <input type="text" id="new-manhwa-chapter-name" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3" placeholder="Chapter Name">
+                            <button id="add-manhwa-chapter-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Chapter</button>
+                        </div>
+                        <div>
+                            <select id="select-manhwa-for-page" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600" onchange="updateManhwaChapters()"></select>
+                            <select id="select-manhwa-chapter-for-page" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3"></select>
+                            <input type="url" id="new-manhwa-page-link" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mt-3" placeholder="Page Link (Image/PDF)">
+                            <button id="add-manhwa-page-btn" class="mt-3 px-6 py-2 btn-premium w-full">Add Page/PDF</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="back-to-user" class="mt-8 px-8 py-3 btn-premium block mx-auto">Back to User</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Data
+        let animes = JSON.parse(localStorage.getItem('animes')) || [
+            {
+                id: 'aot', // Added unique ID for easier lookup
+                name: 'Attack on Titan',
+                seasons: [
+                    { id: 'aot-s1', name: 'Season 1', videos: ['https://www.youtube.com/watch?v=Lu9I2OCrTHU'] },
+                    { id: 'aot-s2', name: 'Season 2', videos: ['https://www.youtube.com/watch?v=M_V_Q0_A_00'] }
+                ]
+            },
+            {
+                id: 'opm',
+                name: 'One Punch Man',
+                seasons: [
+                    { id: 'opm-s1', name: 'Season 1', videos: ['https://www.youtube.com/watch?v=2P5eB_J-000'] }
+                ]
+            }
+        ];
+        let mangas = JSON.parse(localStorage.getItem('mangas')) || [
+            {
+                id: 'op',
+                name: 'One Piece',
+                chapters: [
+                    { id: 'op-c1', name: 'Chapter 1', pages: ['https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/manga-page.jpg'] },
+                    { id: 'op-c2', name: 'Chapter 2', pages: ['https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/manga-page.jpg'] }
+                ]
+            }
+        ];
+        let manhwas = JSON.parse(localStorage.getItem('manhwas')) || [
+            {
+                id: 'tog',
+                name: 'Tower of God',
+                chapters: [
+                    { id: 'tog-c1', name: 'Chapter 1', pages: ['https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/manhwa-page.jpg'] },
+                    { id: 'tog-c2', name: 'Chapter 2', pages: ['https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/manhwa-page.jpg'] }
+                ]
+            }
+        ];
+
+        // Views
+        const animeView = document.getElementById('anime-view');
+        const mangaView = document.getElementById('manga-view');
+        const manhwaView = document.getElementById('manhwa-view');
+        const adminView = document.getElementById('admin-view');
+
+        // Navigation
+        const navAnime = document.getElementById('nav-anime');
+        const navManga = document.getElementById('nav-manga');
+        const navManhwa = document.getElementById('nav-manhwa');
+
+        navAnime.onclick = () => showView('anime');
+        navManga.onclick = () => showView('manga');
+        navManhwa.onclick = () => showView('manhwa');
+
+        function showView(view) {
+            [animeView, mangaView, manhwaView].forEach(v => v.classList.add('hidden'));
+            document.getElementById(`${view}-view`).classList.remove('hidden');
+            [navAnime, navManga, navManhwa].forEach(nav => nav.classList.remove('active'));
+            document.getElementById(`nav-${view}`).classList.add('active');
+            // Hide specific sub-views when switching main views
+            document.getElementById('anime-season-view').classList.add('hidden');
+            document.getElementById('anime-videos-view').classList.add('hidden');
+            document.getElementById('manga-chapter-view').classList.add('hidden');
+            document.getElementById('manga-pages-view').classList.add('hidden');
+            document.getElementById('manhwa-chapter-view').classList.add('hidden');
+            document.getElementById('manhwa-pages-view').classList.add('hidden');
+        }
+
+        // Load functions
+        function loadAnimes() {
+            const grid = document.getElementById('anime-grid');
+            grid.innerHTML = '';
+            animes.forEach((anime, index) => {
+                const card = document.createElement('div');
+                card.className = 'card p-4 rounded-xl cursor-pointer';
+                card.innerHTML = `
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f3c5ae90-e4a7-4539-ae9d-f59fc425b337.png" alt="Anime poster for ${anime.name}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d496ea55-a5d5-469d-be61-a5ef672e9d7d.png';this.alt='Anime poster for ${anime.name}, depicting epic scenes with warriors, monsters, and intricate backgrounds in a dark fantasy world, high-resolution image with vivid colors and dynamic action poses'">
+                    <h3 class="text-lg font-bold">${anime.name}</h3>
+                `;
+                card.onclick = () => showAnimeSeasons(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function showAnimeSeasons(animeIndex) {
+            const anime = animes[animeIndex];
+            document.getElementById('anime-season-view').classList.remove('hidden');
+            document.getElementById('anime-videos-view').classList.add('hidden'); // Hide videos if visible
+            document.getElementById('anime-selected').textContent = `${anime.name} - Seasons`;
+            const seasonsList = document.getElementById('anime-seasons-list');
+            seasonsList.innerHTML = '';
+            if (anime.seasons.length === 0) {
+                seasonsList.innerHTML = '<p class="text-gray-400">No seasons available for this anime.</p>';
+                return;
+            }
+            anime.seasons.forEach((season, seasonIndex) => {
+                const seasonBtn = document.createElement('button');
+                seasonBtn.textContent = season.name;
+                seasonBtn.className = 'nav-btn px-6 py-2';
+                seasonBtn.onclick = () => showAnimeVideos(animeIndex, seasonIndex);
+                seasonsList.appendChild(seasonBtn);
+            });
+        }
+
+        function showAnimeVideos(animeIndex, seasonIndex) {
+            const anime = animes[animeIndex];
+            const season = anime.seasons[seasonIndex];
+            document.getElementById('anime-videos-view').classList.remove('hidden');
+            document.getElementById('anime-selected-season').textContent = `${anime.name} - ${season.name}`;
+            const videosList = document.getElementById('anime-videos-list');
+            videosList.innerHTML = '';
+            if (season.videos.length === 0) {
+                videosList.innerHTML = '<p class="text-gray-400">No videos available for this season.</p>';
+                return;
+            }
+            season.videos.forEach((video, index) => {
+                const videoDiv = document.createElement('div');
+                videoDiv.className = 'card p-4 rounded-xl';
+                // Attempt to embed YouTube videos, otherwise provide a direct link
+                let embedHtml = '';
+                if (video.includes('youtube.com/watch?v=')) {
+                    const videoId = video.split('v=')[1].split('&')[0];
+                    embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-embed"></iframe>`;
+                } else if (video.includes('youtu.be/')) {
+                    const videoId = video.split('youtu.be/')[1].split('?')[0];
+                    embedHtml = `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-embed"></iframe>`;
+                } else {
+                    embedHtml = `<a href="${video}" target="_blank" class="btn-premium px-4 py-2 inline-block">Watch Episode</a>`;
+                }
+
+                videoDiv.innerHTML = `
+                    <h5 class="text-lg mb-2">Episode ${index + 1}</h5>
+                    ${embedHtml}
+                `;
+                videosList.appendChild(videoDiv);
+            });
+        }
+
+        // Manga
+        function loadMangas() {
+            const grid = document.getElementById('manga-grid');
+            grid.innerHTML = '';
+            mangas.forEach((manga, index) => {
+                const card = document.createElement('div');
+                card.className = 'card p-4 rounded-xl cursor-pointer';
+                card.innerHTML = `
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/3820a9b2-d628-424b-98bf-ed99270b9b7d.png" alt="Manga cover for ${manga.name}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/01b580ca-5260-403e-81da-1c85cd15aadd.png';this.alt='Manga cover for ${manga.name}, featuring vibrant illustrations of characters and story elements in a classic manga style, detailed artwork with dynamic poses'">
+                    <h3 class="text-lg font-bold">${manga.name}</h3>
+                `;
+                card.onclick = () => showMangaChapters(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function showMangaChapters(mangaIndex) {
+            const manga = mangas[mangaIndex];
+            document.getElementById('manga-chapter-view').classList.remove('hidden');
+            document.getElementById('manga-pages-view').classList.add('hidden'); // Hide pages if visible
+            document.getElementById('manga-selected').textContent = `${manga.name} - Chapters`;
+            const chaptersList = document.getElementById('manga-chapters-list');
+            chaptersList.innerHTML = '';
+            if (manga.chapters.length === 0) {
+                chaptersList.innerHTML = '<p class="text-gray-400">No chapters available for this manga.</p>';
+                return;
+            }
+            manga.chapters.forEach((chapter, chapterIndex) => {
+                const chapterBtn = document.createElement('button');
+                chapterBtn.textContent = chapter.name;
+                chapterBtn.className = 'nav-btn px-6 py-2';
+                chapterBtn.onclick = () => showMangaPages(mangaIndex, chapterIndex);
+                chaptersList.appendChild(chapterBtn);
+            });
+        }
+
+        function showMangaPages(mangaIndex, chapterIndex) {
+            const manga = mangas[mangaIndex];
+            const chapter = manga.chapters[chapterIndex];
+            document.getElementById('manga-pages-view').classList.remove('hidden');
+            document.getElementById('manga-selected-chapter').textContent = `${manga.name} - ${chapter.name}`;
+            const pagesList = document.getElementById('manga-pages-list');
+            pagesList.innerHTML = '';
+            if (chapter.pages.length === 0) {
+                pagesList.innerHTML = '<p class="text-gray-400">No pages available for this chapter.</p>';
+                return;
+            }
+            chapter.pages.forEach((page, index) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'card p-4 rounded-xl';
+                const isPdf = page.toLowerCase().endsWith('.pdf');
+                pageDiv.innerHTML = `
+                    <h5 class="text-lg mb-2">Page ${index + 1}</h5>
+                    ${isPdf ? `<iframe src="${page}" class="pdf-viewer"></iframe>` : `<img src="${page}" alt="Page ${index + 1}" class="w-full h-64 object-cover image-display" onerror="this.src='https://placehold.co/300x400/666/e5e5e5.png?text=Image+Not+Found';this.alt='Placeholder image indicating the original image could not be loaded.'">`}
+                    <a href="${page}" target="_blank" class="btn-premium px-4 py-2 inline-block mt-2">View Full ${isPdf ? 'PDF' : 'Image'}</a>
+                `;
+                pagesList.appendChild(pageDiv);
+            });
+        }
+
+        // Manhwa - Similar to Manga
+        function loadManhwas() {
+            const grid = document.getElementById('manhwa-grid');
+            grid.innerHTML = '';
+            manhwas.forEach((manhwa, index) => {
+                const card = document.createElement('div');
+                card.className = 'card p-4 rounded-xl cursor-pointer';
+                card.innerHTML = `
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ddb64fc6-023c-434b-a401-0241c91e1e0a.png" alt="Manhwa cover for ${manhwa.name}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f03855fc-2a10-42f3-8249-806f9bd4f0be.png';this.alt='Manhwa cover for ${manhwa.name}, displaying colorful illustrations with characters and plot motifs in manhwa art style, high-quality graphics with expressive figures'">
+                    <h3 class="text-lg font-bold">${manhwa.name}</h3>
+                `;
+                card.onclick = () => showManhwaChapters(index);
+                grid.appendChild(card);
+            });
+        }
+
+        function showManhwaChapters(manhwaIndex) {
+            const manhwa = manhwas[manhwaIndex];
+            document.getElementById('manhwa-chapter-view').classList.remove('hidden');
+            document.getElementById('manhwa-pages-view').classList.add('hidden'); // Hide pages if visible
+            document.getElementById('manhwa-selected').textContent = `${manhwa.name} - Chapters`;
+            const chaptersList = document.getElementById('manhwa-chapters-list');
+            chaptersList.innerHTML = '';
+            if (manhwa.chapters.length === 0) {
+                chaptersList.innerHTML = '<p class="text-gray-400">No chapters available for this manhwa.</p>';
+                return;
+            }
+            manhwa.chapters.forEach((chapter, chapterIndex) => {
+                const chapterBtn = document.createElement('button');
+                chapterBtn.textContent = chapter.name;
+                chapterBtn.className = 'nav-btn px-6 py-2';
+                chapterBtn.onclick = () => showManhwaPages(manhwaIndex, chapterIndex);
+                chaptersList.appendChild(chapterBtn);
+            });
+        }
+
+        function showManhwaPages(manhwaIndex, chapterIndex) {
+            const manhwa = manhwas[manhwaIndex];
+            const chapter = manhwa.chapters[chapterIndex];
+            document.getElementById('manhwa-pages-view').classList.remove('hidden');
+            document.getElementById('manhwa-selected-chapter').textContent = `${manhwa.name} - ${chapter.name}`;
+            const pagesList = document.getElementById('manhwa-pages-list');
+            pagesList.innerHTML = '';
+            if (chapter.pages.length === 0) {
+                pagesList.innerHTML = '<p class="text-gray-400">No pages available for this chapter.</p>';
+                return;
+            }
+            chapter.pages.forEach((page, index) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'card p-4 rounded-xl';
+                const isPdf = page.toLowerCase().endsWith('.pdf');
+                pageDiv.innerHTML = `
+                    <h5 class="text-lg mb-2">Page ${index + 1}</h5>
+                    ${isPdf ? `<iframe src="${page}" class="pdf-viewer"></iframe>` : `<img src="${page}" alt="Page ${index + 1}" class="w-full h-64 object-cover image-display" onerror="this.src='https://placehold.co/300x400/666/e5e5e5.png?text=Image+Not+Found';this.alt='Placeholder image indicating the original image could not be loaded.'">`}
+                    <a href="${page}" target="_blank" class="btn-premium px-4 py-2 inline-block mt-2">View Full ${isPdf ? 'PDF' : 'Image'}</a>
+                `;
+                pagesList.appendChild(pageDiv);
+            });
+        }
+
+        // Admin functions
+        document.getElementById('admin-toggle').onclick = () => {
+            adminView.classList.remove('hidden');
+            document.getElementById('password-prompt').classList.remove('hidden');
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('password-input').value = ''; // Clear password input
+        };
+
+        document.getElementById('password-cancel').onclick = () => {
+            adminView.classList.add('hidden');
+        };
+
+        document.getElementById('password-submit').onclick = () => {
+            if (document.getElementById('password-input').value === '1234') {
+                document.getElementById('password-prompt').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loadAdminLists();
+            } else {
+                alert('Incorrect password!');
+            }
+        };
+
+        document.getElementById('back-to-user').onclick = () => {
+            adminView.classList.add('hidden');
+            showView('anime'); // Go back to anime view by default
+        };
+
+        function loadAdminLists() {
+            // Anime Selects
+            const selectAnimeForSeason = document.getElementById('select-anime-for-season');
+            const selectAnimeForVideo = document.getElementById('select-anime-for-video');
+            selectAnimeForSeason.innerHTML = '<option value="">Select Anime</option>';
+            selectAnimeForVideo.innerHTML = '<option value="">Select Anime</option>';
+            animes.forEach(anime => {
+                const option1 = document.createElement('option');
+                option1.value = anime.id;
+                option1.textContent = anime.name;
+                selectAnimeForSeason.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = anime.id;
+                option2.textContent = anime.name;
+                selectAnimeForVideo.appendChild(option2);
+            });
+            updateAnimeSeasons(); // Initialize season dropdown for video
+
+            // Manga Selects
+            const selectMangaForChapter = document.getElementById('select-manga-for-chapter');
+            const selectMangaForPage = document.getElementById('select-manga-for-page');
+            selectMangaForChapter.innerHTML = '<option value="">Select Manga</option>';
+            selectMangaForPage.innerHTML = '<option value="">Select Manga</option>';
+            mangas.forEach(manga => {
+                const option1 = document.createElement('option');
+                option1.value = manga.id;
+                option1.textContent = manga.name;
+                selectMangaForChapter.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = manga.id;
+                option2.textContent = manga.name;
+                selectMangaForPage.appendChild(option2);
+            });
+            updateMangaChapters(); // Initialize chapter dropdown for page
+
+            // Manhwa Selects
+            const selectManhwaForChapter = document.getElementById('select-manhwa-for-chapter');
+            const selectManhwaForPage = document.getElementById('select-manhwa-for-page');
+            selectManhwaForChapter.innerHTML = '<option value="">Select Manhwa</option>';
+            selectManhwaForPage.innerHTML = '<option value="">Select Manhwa</option>';
+            manhwas.forEach(manhwa => {
+                const option1 = document.createElement('option');
+                option1.value = manhwa.id;
+                option1.textContent = manhwa.name;
+                selectManhwaForChapter.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = manhwa.id;
+                option2.textContent = manhwa.name;
+                selectManhwaForPage.appendChild(option2);
+            });
+            updateManhwaChapters(); // Initialize chapter dropdown for page
+        }
+
+        function updateAnimeSeasons() {
+            const selectedAnimeId = document.getElementById('select-anime-for-video').value;
+            const selectAnimeSeasonForVideo = document.getElementById('select-anime-season-for-video');
+            selectAnimeSeasonForVideo.innerHTML = '<option value="">Select Season</option>';
+
+            if (selectedAnimeId) {
+                const selectedAnime = animes.find(anime => anime.id === selectedAnimeId);
+                if (selectedAnime && selectedAnime.seasons) {
+                    selectedAnime.seasons.forEach(season => {
+                        const option = document.createElement('option');
+                        option.value = season.id;
+                        option.textContent = season.name;
+                        selectAnimeSeasonForVideo.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        function updateMangaChapters() {
+            const selectedMangaId = document.getElementById('select-manga-for-page').value;
+            const selectMangaChapterForPage = document.getElementById('select-manga-chapter-for-page');
+            selectMangaChapterForPage.innerHTML = '<option value="">Select Chapter</option>';
+
+            if (selectedMangaId) {
+                const selectedManga = mangas.find(manga => manga.id === selectedMangaId);
+                if (selectedManga && selectedManga.chapters) {
+                    selectedManga.chapters.forEach(chapter => {
+                        const option = document.createElement('option');
+                        option.value = chapter.id;
+                        option.textContent = chapter.name;
+                        selectMangaChapterForPage.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        function updateManhwaChapters() {
+            const selectedManhwaId = document.getElementById('select-manhwa-for-page').value;
+            const selectManhwaChapterForPage = document.getElementById('select-manhwa-chapter-for-page');
+            selectManhwaChapterForPage.innerHTML = '<option value="">Select Chapter</option>';
+
+            if (selectedManhwaId) {
+                const selectedManhwa = manhwas.find(manhwa => manhwa.id === selectedManhwaId);
+                if (selectedManhwa && selectedManhwa.chapters) {
+                    selectedManhwa.chapters.forEach(chapter => {
+                        const option = document.createElement('option');
+                        option.value = chapter.id;
+                        option.textContent = chapter.name;
+                        selectManhwaChapterForPage.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        // Add event listeners for admin buttons
+        document.getElementById('add-anime-btn').onclick = () => {
+            const name = document.getElementById('new-anime-name').value.trim();
+            if (name) {
+                animes.push({ id: 'anime-' + Date.now(), name: name, seasons: [] });
+                document.getElementById('new-anime-name').value = '';
+                saveAndReload();
+                alert('Anime added successfully!');
+            } else {
+                alert('Please enter an anime name.');
+            }
+        };
+
+        document.getElementById('add-anime-season-btn').onclick = () => {
+            const animeId = document.getElementById('select-anime-for-season').value;
+            const seasonName = document.getElementById('new-season-name').value.trim();
+            if (animeId && seasonName) {
+                const anime = animes.find(a => a.id === animeId);
+                if (anime) {
+                    anime.seasons.push({ id: 'season-' + Date.now(), name: seasonName, videos: [] });
+                    document.getElementById('new-season-name').value = '';
+                    saveAndReload();
+                    alert('Season added successfully!');
+                }
+            } else {
+                alert('Please select an anime and enter a season name.');
+            }
+        };
+
+        document.getElementById('add-video-btn').onclick = () => {
+            const animeId = document.getElementById('select-anime-for-video').value;
+            const seasonId = document.getElementById('select-anime-season-for-video').value;
+            const videoLink = document.getElementById('new-video-link').value.trim();
+            if (animeId && seasonId && videoLink) {
+                const anime = animes.find(a => a.id === animeId);
+                if (anime) {
+                    const season = anime.seasons.find(s => s.id === seasonId);
+                    if (season) {
+                        season.videos.push(videoLink);
+                        document.getElementById('new-video-link').value = '';
+                        saveAndReload();
+                        alert('Video added successfully!');
+                    }
+                }
+            } else {
+                alert('Please select an anime, season, and enter a video link.');
+            }
+        };
+
+        document.getElementById('add-manga-btn').onclick = () => {
+            const name = document.getElementById('new-manga-name').value.trim();
+            if (name) {
+                mangas.push({ id: 'manga-' + Date.now(), name: name, chapters: [] });
+                document.getElementById('new-manga-name').value = '';
+                saveAndReload();
+                alert('Manga added successfully!');
+            } else {
+                alert('Please enter a manga name.');
+            }
+        };
+
+        document.getElementById('add-manga-chapter-btn').onclick = () => {
+            const mangaId = document.getElementById('select-manga-for-chapter').value;
+            const chapterName = document.getElementById('new-chapter-name').value.trim();
+            if (mangaId && chapterName) {
+                const manga = mangas.find(m => m.id === mangaId);
+                if (manga) {
+                    manga.chapters.push({ id: 'chapter-' + Date.now(), name: chapterName, pages: [] });
+                    document.getElementById('new-chapter-name').value = '';
+                    saveAndReload();
+                    alert('Chapter added successfully!');
+                }
+            } else {
+                alert('Please select a manga and enter a chapter name.');
+            }
+        };
+
+        document.getElementById('add-page-btn').onclick = () => {
+            const mangaId = document.getElementById('select-manga-for-page').value;
+            const chapterId = document.getElementById('select-manga-chapter-for-page').value;
+            const pageLink = document.getElementById('new-page-link').value.trim();
+            if (mangaId && chapterId && pageLink) {
+                const manga = mangas.find(m => m.id === mangaId);
+                if (manga) {
+                    const chapter = manga.chapters.find(c => c.id === chapterId);
+                    if (chapter) {
+                        chapter.pages.push(pageLink);
+                        document.getElementById('new-page-link').value = '';
+                        saveAndReload();
+                        alert('Page/PDF added successfully!');
+                    }
+                }
+            } else {
+                alert('Please select a manga, chapter, and enter a page link.');
+            }
+        };
+
+        document.getElementById('add-manhwa-btn').onclick = () => {
+            const name = document.getElementById('new-manhwa-name').value.trim();
+            if (name) {
+                manhwas.push({ id: 'manhwa-' + Date.now(), name: name, chapters: [] });
+                document.getElementById('new-manhwa-name').value = '';
+                saveAndReload();
+                alert('Manhwa added successfully!');
+            } else {
+                alert('Please enter a manhwa name.');
+            }
+        };
+
+        document.getElementById('add-manhwa-chapter-btn').onclick = () => {
+            const manhwaId = document.getElementById('select-manhwa-for-chapter').value;
+            const chapterName = document.getElementById('new-manhwa-chapter-name').value.trim();
+            if (manhwaId && chapterName) {
+                const manhwa = manhwas.find(m => m.id === manhwaId);
+                if (manhwa) {
+                    manhwa.chapters.push({ id: 'chapter-' + Date.now(), name: chapterName, pages: [] });
+                    document.getElementById('new-manhwa-chapter-name').value = '';
+                    saveAndReload();
+                    alert('Chapter added successfully!');
+                }
+            } else {
+                alert('Please select a manhwa and enter a chapter name.');
+            }
+        };
+
+        document.getElementById('add-manhwa-page-btn').onclick = () => {
+            const manhwaId = document.getElementById('select-manhwa-for-page').value;
+            const chapterId = document.getElementById('select-manhwa-chapter-for-page').value;
+            const pageLink = document.getElementById('new-manhwa-page-link').value.trim();
+            if (manhwaId && chapterId && pageLink) {
+                const manhwa = manhwas.find(m => m.id === manhwaId);
+                if (manhwa) {
+                    const chapter = manhwa.chapters.find(c => c.id === chapterId);
+                    if (chapter) {
+                        chapter.pages.push(pageLink);
+                        document.getElementById('new-manhwa-page-link').value = '';
+                        saveAndReload();
+                        alert('Page/PDF added successfully!');
+                    }
+                }
+            } else {
+                alert('Please select a manhwa, chapter, and enter a page link.');
+            }
+        };
+
+
+        function saveAndReload() {
+            localStorage.setItem('animes', JSON.stringify(animes));
+            localStorage.setItem('mangas', JSON.stringify(mangas));
+            localStorage.setItem('manhwas', JSON.stringify(manhwas));
+            loadAnimes();
+            loadMangas();
+            loadManhwas();
+            loadAdminLists(); // Reload admin lists to reflect new additions
+        }
+
+        // Initial loads
+        showView('anime'); // Start with anime view active
+        saveAndReload(); // Ensure initial data is loaded and displayed
+    </script>
+</body>
+</html>
